@@ -1,0 +1,2 @@
+bbc/bbc_labels.txt filter=lfs diff=lfs merge=lfs -text
+bio/a100_labels.txt filter=lfs diff=lfs merge=lfs -text

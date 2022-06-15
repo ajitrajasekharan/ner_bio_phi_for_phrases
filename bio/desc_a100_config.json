@@ -1,0 +1,7 @@
+{"POS_SERVER_URL": "http://127.0.0.1:8073/",
+"LOG_DESCS": "0",
+"USE_CLS": "1",
+"IGNORE_CS": "1",
+"BASE_PATH":"./bio/",
+"COMMON_DESCS_FILE": "untagged_terms.txt"
+}
