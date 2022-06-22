@@ -23,6 +23,7 @@ DEFAULT_ENTITY_MAP = "entity_types_consolidated.txt"
 #RESET_POS_TAG='RESET'
 SPECIFIC_TAG=":__entity__"
 
+debug = False
 
 def softmax(x):
     """Compute softmax values for each sets of scores in x."""
@@ -144,7 +145,8 @@ class UnsupNER:
                     self.algo_ci_tag_fp.write("SENT:" + ner_str.replace('\n',' ') + "\n")
                     out = terms[0].replace('[',' ').replace(']','').split()[-1]
                     out = '_'.join(out.split('_')[1:]) if out.startswith("B_") else out
-                    print(out)
+                    if (debug):
+                        print(out)
                     self.algo_ci_tag_fp.write(ret_dict[count-2]["term"] + " " + out + "\n")
                     self.algo_ci_tag_fp.flush()
             else:
@@ -225,7 +227,8 @@ class UnsupNER:
                 pooled_st[st] = sd
             pooled_results[e]["stypes"] = pooled_st
         debug_str_arr.append(' '.join(d_str_arr))
-        print(' '.join(d_str_arr))
+        if (debug):
+            print(' '.join(d_str_arr))
         return pooled_results
 
 
@@ -313,7 +316,8 @@ class UnsupNER:
             dfp.flush()
             return json_str
         else:
-            print(detected_entities_arr)
+            if (debug):
+                print(detected_entities_arr)
             debug_str_arr.append("NER_FINAL_RESULTS: " + ' '.join(detected_entities_arr))
             print("--------")
             dfp.write('\n'.join(debug_str_arr))
@@ -334,7 +338,8 @@ class UnsupNER:
 
     def gen_single_phrase_sentences(self,terms_arr,masked_sent_arr,span_arr,rfp,dfp):
         sentence_template = "%s is a entity"
-        print(span_arr)
+        if (debug):
+            print(span_arr)
         sentences = []
         singleton_spans_arr  = []
         run_index = 0
@@ -361,8 +366,9 @@ class UnsupNER:
                 sentence = sentence_template % entity
                 sentences.append(sentence)
                 singleton_spans_arr.append(singleton_span)
-                print(sentence)
-                print(singleton_span)
+                if (debug):
+                    print(sentence)
+                    print(singleton_span)
                 entity = ""
                 singleton_span = []
             else:
@@ -394,7 +400,8 @@ class UnsupNER:
         assert(len(cs_entities) == len(cs_confidences))
         orig_cs_arr = []
         for e,c in zip(cs_entities,cs_confidences):
-            print(e,c)
+            if (debug):
+                print(e,c)
             e_split = e.split('[')
             e_main = e_split[0]
             if (len(e_split) > 1):
@@ -515,11 +522,12 @@ class UnsupNER:
 
 
     def emit_sentence_entities(self,sent,terms_arr,detected_entities_arr,span_arr,rfp):
-        print("Final result")
         ret_str = ""
-        for i,term in enumerate(terms_arr):
-            print(term,' ',end='')
-        print()
+        if (debug):
+            print("Final result")
+            for i,term in enumerate(terms_arr):
+                print(term,' ',end='')
+            print()
         sent_arr = sent.split()
         assert(len(terms_arr) == len(span_arr))
         entity_index = 0
@@ -539,7 +547,8 @@ class UnsupNER:
                     tag = "B_" + detected_entities_arr[entity_index]
             rfp.write(terms_arr[i] + ' ' + tag + "\n")
             ret_str = ret_str + terms_arr[i] + ' ' + tag + "\n"
-            print(tag + ' ',end='')
+            if (debug):
+                print(tag + ' ',end='')
             i += 1
         print()
         rfp.write("\n")
@@ -615,6 +624,9 @@ class UnsupNER:
                                                                                     #Also trunc_e contains the consolidated entity names.
             assert(len(trunc_e) <= len(curr_counts)) # can be less if untagged is skipped
             assert(len(trunc_e) == len(trunc_counts))
+            if (len(trunc_e) == 0):
+                i += 2
+                continue
             trunc_counts = softmax(trunc_counts) #this normalization is done to reduce the effect of absolute count of certain labeled entities, while aggregating the entity vectors across descriptors
             curr_counts_sum = sum(map(int,trunc_counts)) #Using truncated count
             curr_counts_sum = 1 if curr_counts_sum == 0 else curr_counts_sum
@@ -637,13 +649,16 @@ class UnsupNER:
         factors = self.convert_positive_nums_to_dist(final_sorted_d)
         ret_entities = list(final_sorted_d.keys())
         confidences = factors.tolist()
-        print(ret_entities)
+        if (debug):
+            print(ret_entities)
         sorted_subtypes = self.sort_subtypes(subtypes)
         ret_entities = self.update_entities_with_subtypes(ret_entities,sorted_subtypes)
-        print(ret_entities)
+        if (debug):
+            print(ret_entities)
         debug_str_arr.append(" ")
         debug_str_arr.append(' '.join(ret_entities))
-        print(confidences)
+        if (debug):
+            print(confidences)
         assert(len(confidences) == len(ret_entities))
         arr = []
         for e,c in zip(ret_entities,confidences):
@@ -726,7 +741,8 @@ class UnsupNER:
                 desc_arr.append(temp_dict)
             index += 1
         debug_str_arr.append("\n" + ', '.join(debug_combined_arr))
-        print(debug_combined_arr)
+        if (debug):
+            print(debug_combined_arr)
         entity_info_dict["descs"] = desc_arr
         #debug_str_arr.append(' '.join(entities))
         assert(len(entities) == len(descs))
