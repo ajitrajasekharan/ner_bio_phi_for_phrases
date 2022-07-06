@@ -4,7 +4,7 @@ This is a tweaked version of self-supervised NER for tagging phrases
 # Installations
 pip install -r requirements.txt
 
-apt-get udpate
+apt-get update
 
 apt-get install git-lfs
 
