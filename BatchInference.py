@@ -1,7 +1,6 @@
 import torch
 import subprocess
-#from pytorch_transformers import *
-from transformers import *
+from transformers import BertTokenizer,BertForMaskedLM
 import pdb
 import operator
 from collections import OrderedDict
@@ -149,6 +148,12 @@ class BatchInference:
         self.delimsep  = delimsep
         self.truncated_fp = open(base_path + "truncated_sentences.txt","a")
         self.always_log_fp = open(base_path + "CI_LOGS.txt","a")
+        if (cf.read_config(config_file)["USE_PROMPT"] == "1"): #Models like Bert base cased return same prediction for CLS regardless of input. So ignore CLS
+            print("************** USE PROMPT: Turned ON for this model. ******* ")
+            self.use_prompt = True
+        else:
+            print("************** USE PROMPT: Turned OFF for this model. ******* ")
+            self.use_prompt = False
         if (cf.read_config(config_file)["USE_CLS"] == "1"): #Models like Bert base cased return same prediction for CLS regardless of input. So ignore CLS
             print("************** USE CLS: Turned ON for this model. ******* ")
             self.use_cls = True
@@ -237,7 +242,11 @@ class BatchInference:
 
 
     def gen_single_phrase_sentences(self,terms_arr,span_arr):
-        sentence_template = "%s is a entity"
+        if (self.use_prompt):
+            sentence_template = "%s is a entity"
+        else:
+            #For pure phrase tagging ignore the usual prompting
+            sentence_template = "%s"
         #print(span_arr)
         sentences = []
         singleton_spans_arr  = []

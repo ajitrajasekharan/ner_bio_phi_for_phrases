@@ -2,6 +2,7 @@
 "LOG_DESCS": "0",
 "USE_CLS": "0",
 "IGNORE_CS": "1",
+"USE_PROMPT": "1",
 "BASE_PATH":"./bbc/",
 "COMMON_DESCS_FILE": "untagged_terms.txt"
 }
